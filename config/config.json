@@ -1,6 +1,6 @@
 {
   "development": {
-    "username": "evgeniy",
+    "username": "root",
     "password": "password",
     "database": "adonis",
     "host": "127.0.0.1",

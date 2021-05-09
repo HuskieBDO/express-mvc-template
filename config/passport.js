@@ -38,11 +38,7 @@ passport.use(
     async (email, password, done) => {
       try {
         const user = await User.create({ email, password });
-        done(
-          null,
-          { ...user.toJSON() },
-          { message: 'Successfully registered' }
-        );
+        done(null, user.toJSON(), { message: 'Successfully registered' });
       } catch (error) {
         done(error);
       }
@@ -71,11 +67,7 @@ passport.use(
           return done(null, false, { message: 'Wrong Password' });
         }
 
-        return done(
-          null,
-          { ...user.toJSON() },
-          { message: 'Logged in Successfully' }
-        );
+        return done(null, user.toJSON(), { message: 'Logged in Successfully' });
       } catch (error) {
         return done(error);
       }
@@ -91,7 +83,7 @@ passport.use(
       clientSecret: 'zlXjuSNPOAUhNFcsTAbn',
       callbackURL: 'http://127.0.0.1:3333/api/auth/social/vkontakte/callback',
     },
-    async (accessToken, refreshToken, params, profile, done) => {
+    async (req, accessToken, refreshToken, params, profile, done) => {
       const socialAccount = await SocialAccount.findOne({
         where: { sid: profile.id },
       });
@@ -122,10 +114,7 @@ passport.use(
           provider: 'vkontakte',
         });
       }
-      return done(null, {
-        ...user.toJSON(),
-        token: jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY),
-      });
+      return done(null, user.toJSON());
     }
   )
 );
@@ -136,7 +125,7 @@ passport.serializeUser(function (user, done) {
 
 passport.deserializeUser(async function (id, done) {
   try {
-    const user = await User.findOne({ where: { id } });
+    const user = await User.findByPk(id);
     done(null, user);
   } catch (e) {
     done(null, e);

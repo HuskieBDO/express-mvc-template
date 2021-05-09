@@ -19,9 +19,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', require('./routes/api'));
 
 // Handle errors.
-app.use((err, req, res) => {
-  res.status(err.status || 500);
-  res.json({ error: err });
+app.use((req, res) => {
+  res.status(500);
 });
 
 const PORT = process.env.PORT || 3333;

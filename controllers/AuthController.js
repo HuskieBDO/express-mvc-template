@@ -16,7 +16,7 @@ module.exports = {
 
           const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
 
-          return res.json({ message: 'Successful loggedin', token });
+          return res.json({ message: 'Successful loggedin', data: {token} });
         });
       } catch (error) {
         return next(error);
@@ -38,7 +38,7 @@ module.exports = {
 
           const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
 
-          return res.json({ message: 'Successful registered', token });
+          return res.json({ message: 'Successful registered', data: {token} });
         });
       } catch (error) {
         return next(error);

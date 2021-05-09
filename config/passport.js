@@ -8,8 +8,8 @@ const JWTStrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 const VKStrategy = require('passport-vkontakte').Strategy;
 
-const User = require('../models').User;
-const SocialAccount = require('../models').SocialAccount;
+const { User } = require('../models');
+const { SocialAccount } = require('../models');
 
 passport.use(
   new JWTStrategy(
@@ -18,9 +18,9 @@ passport.use(
       jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
       // authScheme: 'Bearer',
     },
-    async (jwt_payload, done) => {
+    async (jwtPayload, done) => {
       try {
-        done(null, jwt_payload);
+        done(null, jwtPayload);
       } catch (error) {
         done(error);
       }
@@ -101,9 +101,14 @@ passport.use(
           where: { email: profile.emails[0].value },
         });
       }
-      if (user) {
+      if (user && !socialAccount) {
+        await SocialAccount.create({
+          userId: user.id,
+          sid: profile.id,
+          provider: 'vkontakte',
+        });
       } else if (socialAccount) {
-        user = await User.findOne({ where: { id: socialAccont.userId } });
+        user = await User.findOne({ where: { id: socialAccount.userId } });
       } else {
         user = await User.create({
           firstName: profile.first_name,

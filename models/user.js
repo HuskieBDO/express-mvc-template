@@ -1,4 +1,3 @@
-'use strict';
 const { Model } = require('sequelize');
 const bcrypt = require('bcrypt');
 
@@ -23,8 +22,21 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      email: DataTypes.STRING,
-      password: DataTypes.STRING,
+      email: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      fullName: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          if (!this.firstName && !this.lastName) return null;
+          return `${this.firstName ?? ''} ${this.lastName ?? ''}`;
+        },
+      },
     },
     {
       hooks: {

@@ -22,11 +22,14 @@
     "nodemon": "^2.0.7",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
+    "passport-jwt.socketio": "^0.1.1",
     "passport-local": "^1.0.0",
     "passport-vkontakte": "^0.5.0",
+    "passport.socketio": "^3.7.0",
     "sequelize": "^6.6.2",
     "sequelize-cli": "^6.2.0",
     "socket.io": "^4.0.2",
+    "socketio-jwt-auth": "^0.2.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

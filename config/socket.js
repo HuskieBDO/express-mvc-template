@@ -1,6 +1,5 @@
 const socketio = require('socket.io');
 const socketioJwt = require('socketio-jwt-auth');
-const middleware = require('socketio-wildcard')();
 const { User } = require('../models');
 
 const ChatController = require('../controllers/ChatController');
@@ -13,14 +12,6 @@ module.exports = (server) => {
       credentials: false,
     },
   });
-
-  io.use(middleware);
-
-  /* socketioJwt.authorize({
-    secret: process.env.JWT_SECRET_KEY,
-    handshake: true,
-    decodedPropertyName: 'user',
-  }); */
 
   setInterval(() => {
     io.of('/chat').emit('chat.online', { count: io.engine.clientsCount });

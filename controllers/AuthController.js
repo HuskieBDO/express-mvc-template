@@ -1,7 +1,7 @@
-const User = require('../models').User;
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const { User } = require('../models');
 
 module.exports = {
   async login(req, res, next) {
@@ -68,24 +68,28 @@ module.exports = {
   async redirect(req, res, next) {
     const { provider } = req.params;
     const { token } = req.query;
-    const user = await User.findByPk(4);
-    await req.login(user, function (err) {
-      console.log('next');
-    });
-    console.log(req.user);
-    return passport.authenticate(provider, {
+    passport.authenticate(provider, {
       session: false,
       scope: ['email'],
-      state: req.header('Referer') || 'http://localhost:3000/',
+      state: `token=${token}&redirect=${req.get('Referrer')}`,
     })(req, res, next);
   },
 
   async callback(req, res, next) {
-    console.log('user', req.user);
     const { provider } = req.params;
-    await passport.authenticate(provider, {
-      session: false,
-    })(req, res, next);
-    res.redirect(req.query.state);
+    await passport.authenticate(
+      provider,
+      {
+        session: false,
+      },
+      (err, user) => {
+        if (err) return next(new Error('connection denied'));
+        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET_KEY);
+        const backUrl = req.get('Referrer')
+          ? req.get('Referrer')
+          : 'http://localhost:3000';
+        return res.redirect(`${backUrl}?token=${token}`);
+      }
+    )(req, res, next);
   },
 };

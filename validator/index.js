@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 
 const validateLogin = require('./validateLogin');
 const validateRegister = require('./validateRegister');
+const validateProfile = require('./validateProfile');
 
 const validate = (req, res, next) => {
   const errors = validationResult(req);

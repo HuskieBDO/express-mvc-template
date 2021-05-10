@@ -1,5 +1,7 @@
 const { body } = require('express-validator');
 
-module.exports = validateLogin = () => {
+const validateLogin = () => {
   return [body('email').isEmail(), body('password').isLength({ min: 5 })];
 };
+
+module.exports = validateLogin;

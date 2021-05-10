@@ -1,10 +1,11 @@
 const { body } = require('express-validator');
-const db = require('../models');
-const User = db.User;
 
-module.exports = ValidateRegister = () => {
+const { User } = require('../models');
+
+const validateRegister = () => {
   return [
     body('email')
+      .normalizeEmail()
       .isEmail()
       .custom(async (value) => {
         const user = await User.findOne({ where: { email: value } });
@@ -22,3 +23,5 @@ module.exports = ValidateRegister = () => {
     }),
   ];
 };
+
+module.exports = validateRegister;

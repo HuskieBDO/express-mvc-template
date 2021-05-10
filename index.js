@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const express = require('express');
 const passport = require('passport');
+const { ValidationError } = require('express-validation');
 
 const app = express();
 const server = require('http').Server(app);
@@ -18,9 +19,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', require('./routes/api'));
 
-// Handle errors.
-app.use((req, res) => {
-  res.status(500);
+app.use(function (err, req, res, next) {
+  if (err instanceof ValidationError) {
+    return res.status(err.statusCode).json(err);
+  }
+
+  return res.status(500).json(err);
 });
 
 const PORT = process.env.PORT || 3333;

@@ -84,11 +84,25 @@ passport.use(
       callbackURL: 'http://127.0.0.1:3333/api/auth/social/vkontakte/callback',
     },
     async (req, accessToken, refreshToken, params, profile, done) => {
+      let token = req.query.state.includes('token')
+        ? req.query.state.split('token=')[1]
+        : null;
+      let user = null;
+
+      if (token === 'undefined') {
+        token = null;
+      }
+
+      if (token) {
+        const jwtDecoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
+        if (jwtDecoded.id) {
+          user = await User.findByPk(jwtDecoded.id);
+        }
+      }
       const socialAccount = await SocialAccount.findOne({
         where: { sid: profile.id },
       });
-      let user = null;
-      if (profile.emails.length) {
+      if (!user && profile.emails?.length) {
         user = await User.findOne({
           where: { email: profile.emails[0].value },
         });
@@ -99,13 +113,13 @@ passport.use(
           sid: profile.id,
           provider: 'vkontakte',
         });
-      } else if (socialAccount) {
+      } else if (!user && socialAccount) {
         user = await User.findOne({ where: { id: socialAccount.userId } });
-      } else {
+      } else if (!user) {
         user = await User.create({
           firstName: profile.first_name,
           lastName: profile.last_name,
-          email: profile.emails.length ? profile.emails[0].value : null,
+          email: profile.emails?.length ? profile.emails[0].value : null,
           password: uuidv4(),
         });
         await SocialAccount.create({
@@ -120,7 +134,7 @@ passport.use(
 );
 
 passport.serializeUser(function (user, done) {
-  done(null, user.id);
+  done(null, user);
 });
 
 passport.deserializeUser(async function (id, done) {
